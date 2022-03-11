@@ -27,21 +27,55 @@ const roll = () => {
   if (rollOnePins === 0) {
     rollOnePins = Math.floor(Math.random() * 10) + 1;
     console.log('1:', rollOnePins);
- 
-  } else if (rollOnePins > 1) {
+    if (rollOnePins === 10) {
+      scoring([rollOnePins, rollTwoPins]);
+      rollOnePins = 0;
+    }
+  } else if (rollOnePins > 0) {
     rollTwoPins = Math.floor(Math.random() * (10-rollOnePins)) + 1;
     console.log('1:',rollOnePins, '2:',rollTwoPins);
+    scoring([rollOnePins, rollTwoPins]);
     rollOnePins = 0;
     rollTwoPins = 0;
   }
 }
 
+const scoring = (arr) => {
+  if (arr[0] === 10) {
+    frameData = {
+      frame: gameData.length + 1,
+      rollOneScore: 10,
+      rollTwoScore: null,
+      frameScore: 10,
+      strike: true
+    }
+  } else {
+    frameData = {
+      frame: gameData.length + 1,
+      rollOneScore: arr[0],
+      rollTwoScore: arr[1],
+      frameScore: arr[0] + arr[1]
+    }
+  }
+  gameData.push(frameData);
+  console.log(gameData);
+  if (gameData[gameData.length-1].frame === 10) {
+    console.log('game over');
+  }
+}
 
-
-
+// foreach gameData.framscore add to score
+const score = () => {
+  let score = 0;
+  gameData.forEach(frame => {
+    score += frame.frameScore;
+  });
+  return score;
+}
 
 // add event listener to roll button
 rollBtn.addEventListener('click', () => {
   roll();
+  document.getElementById('score').innerHTML = score();
 });
 
