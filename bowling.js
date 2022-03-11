@@ -85,25 +85,14 @@ const data = [
       "rollOneScore": 9,
       "rollTwoScore": 1,
       "frameScore": 10,
-      "result": ""
-  },
-  {
-      "frame": 11,
-      "rollOneScore": 7,
-      "rollTwoScore": 3,
-      "frameScore": 10,
       "result": "spare"
   }
 ]
 
-let pinsKnockedDown = [];
-let rollNum = 0;
-
 const rollBtn = document.getElementById('roll');
 rollBtn.addEventListener('click', () => {
-  rollNum++;
   roll();
-  document.getElementById('score').innerHTML = score();
+  document.getElementById('score').innerHTML = score(gameData);
 });
 
 const checkForStrike = (gdArr) => {
@@ -111,7 +100,7 @@ const checkForStrike = (gdArr) => {
   for (let i = 0; i < gdArr.length; i++) {
     if (gdArr[i] !== gdArr[0] && gdArr[i-1].result === 'strike') {
       strikeScore = gdArr[i-1].rollOneScore + gdArr[i].rollOneScore;
-      if (gdArr[i].rollTwoScore === null)  {
+      if (gdArr[i+1] !== undefined && gdArr[i].rollTwoScore === null)  {
         strikeScore += gdArr[i+1].rollOneScore;
       } else {
         strikeScore += gdArr[i].rollTwoScore;
@@ -129,23 +118,26 @@ const checkForSpare = (gdArr) => {
   }
 }
 
-let rollOnePins = 0
-let rollTwoPins = 0
+let rollOnePins = null
+let rollTwoPins = null
 
 const roll = () => {
-  if (rollOnePins === 0) {
-    rollOnePins = Math.floor(Math.random() * 10) + 1;
+  if (rollOnePins === null) {
+    // random number between 0 and 10
+    rollOnePins = Math.floor(Math.random() * 11);
+    // rollOnePins = Math.floor(Math.random() * 10) + 1;
     console.log('1:', rollOnePins);
     if (rollOnePins === 10) {
       scoring([rollOnePins, rollTwoPins]);
-      rollOnePins = 0;
+      rollOnePins = null;
     }
-  } else if (rollOnePins > 0) {
-    rollTwoPins = Math.floor(Math.random() * (10-rollOnePins)) + 1;
+  } else if (rollOnePins !== null) {
+    // random number between 0 and (10 - rollOnePins)
+    rollTwoPins = Math.floor(Math.random() * (10 - rollOnePins));
     console.log('1:',rollOnePins, '2:',rollTwoPins);
     scoring([rollOnePins, rollTwoPins]);
-    rollOnePins = 0;
-    rollTwoPins = 0;
+    rollOnePins = null;
+    rollTwoPins = null;
   }
 }
 
@@ -176,22 +168,18 @@ const scoring = (arr) => {
     }
   }
   gameData.push(frameData);
-  checkForSpare(data);
-  checkForStrike(data);
-  console.log(data);
+  checkForSpare(gameData);
+  checkForStrike(gameData);
   if (gameData[gameData.length-1].frame === 10) {
     console.log('game over');
-    console.log(gameData)
   }
+  console.log(gameData);
 }
 
-const score = () => {
+const score = (arr) => {
   let score = 0;
-  gameData.forEach(frame => {
+  arr.forEach(frame => {
     score += frame.frameScore;
   });
   return score;
 }
-
-
-
