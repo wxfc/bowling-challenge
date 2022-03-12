@@ -9,6 +9,11 @@
 // 1 - 10 pins
 // 2
 
+// todo:
+// 1. handle frame 10 and gameover 
+// 2. reset button
+// 3. display score and frames
+
 let gameData = [];
 let frameData = {
   frame: 0,
@@ -16,123 +21,104 @@ let frameData = {
   rollTwoScore: 0,
   frameScore: 0
 }
-const data = [
-  {
-      "frame": 1,
-      "rollOneScore": 10,
-      "rollTwoScore": null,
-      "frameScore": 10,
-      "result": "strike"
-  },
-  {
-      "frame": 2,
-      "rollOneScore": 10,
-      "rollTwoScore": null,
-      "frameScore": 10,
-      "result": "strike"
-  },
-  {
-      "frame": 3,
-      "rollOneScore": 10,
-      "rollTwoScore": null,
-      "frameScore": 10,
-      "result": "strike"
-  },
-  {
-      "frame": 4,
-      "rollOneScore": 6,
-      "rollTwoScore": 4,
-      "frameScore": 10,
-      "result": "spare"
-  },
-  {
-      "frame": 5,
-      "rollOneScore": 7,
-      "rollTwoScore": 3,
-      "frameScore": 10,
-      "result": "spare"
-  },
-  {
-      "frame": 6,
-      "rollOneScore": 7,
-      "rollTwoScore": 3,
-      "frameScore": 10,
-      "result": ""
-  },
-  {
-      "frame": 7,
-      "rollOneScore": 3,
-      "rollTwoScore": 1,
-      "frameScore": 4,
-      "result": ""
-  },
-  {
-      "frame": 8,
-      "rollOneScore": 4,
-      "rollTwoScore": 2,
-      "frameScore": 6,
-      "result": ""
-  },
-  {
-      "frame": 9,
-      "rollOneScore": 7,
-      "rollTwoScore": 1,
-      "frameScore": 8,
-      "result": ""
-  },
-  {
-      "frame": 10,
-      "rollOneScore": 9,
-      "rollTwoScore": 1,
-      "frameScore": 10,
-      "result": "spare"
-  }
-]
 
 const rollBtn = document.getElementById('roll');
 rollBtn.addEventListener('click', () => {
-  roll();
+  if (gameData.length === 9) {
+    handleFrameTen(gameData);
+    document.getElementById('score').innerHTML = score(gameData);
+  } else if (gameData[9] !== undefined && gameData[9].frame === 10) {
+    // click reset button to start new game
+    document.getElementById('resetGame').innerHTML = 'Click Reset to start new game';
+  } else {
+    roll();
   document.getElementById('score').innerHTML = score(gameData);
+  }
 });
 
-const checkForStrike = (gdArr) => {
-  let strikeScore = 0;
-  for (let i = 0; i < gdArr.length; i++) {
-    if (gdArr[i] !== gdArr[0] && gdArr[i-1].result === 'strike') {
-      strikeScore = gdArr[i-1].rollOneScore + gdArr[i].rollOneScore;
-      if (gdArr[i+1] !== undefined && gdArr[i].rollTwoScore === null)  {
-        strikeScore += gdArr[i+1].rollOneScore;
-      } else {
-        strikeScore += gdArr[i].rollTwoScore;
+const resetBtn = document.getElementById('reset');
+resetBtn.addEventListener('click', () => {
+  gameData = [];
+  frameData = {
+    frame: 0,
+    rollOneScore: 0,
+    rollTwoScore: 0,
+    frameScore: 0
+  }
+  document.getElementById('score').innerHTML = score(gameData);
+  document.getElementById('endGame').innerHTML = '';
+  document.getElementById('resetGame').innerHTML = '';
+})
+
+
+let rollOnePins = null 
+let rollTwoPins = null 
+
+let frameTenRollOne = null
+let frameTenRollTwo = null
+let frameTenRollThree = null;
+
+const handleFrameTen = (gdArr) => {
+    console.log('frame ten');
+  if (frameTenRollOne === null) {
+    frameTenRollOne = Math.floor(Math.random() * 11);
+    console.log('1:', frameTenRollOne);
+  } else if (frameTenRollOne !== null && frameTenRollTwo === null) {
+    if (frameTenRollOne === 10) {
+      frameTenRollTwo = Math.floor(Math.random() * 11);
+      console.log('2:', frameTenRollTwo);
+    } else {
+      frameTenRollTwo = Math.floor(Math.random() * (10 - frameTenRollOne));
+      if (frameTenRollOne + frameTenRollTwo < 10) {
+        frameData = {
+          frame: 10,
+          rollOneScore: frameTenRollOne,
+          rollTwoScore: frameTenRollTwo,
+          frameScore: frameTenRollOne + frameTenRollTwo,
+          result: 'final frame'
+        }
+        gameData.push(frameData);
+        console.log('2:', frameTenRollTwo);
+        console.log(gameData);
+        document.getElementById('endGame').innerHTML = 'End Game';
+        frameTenRollOne = null;
+        frameTenRollTwo = null;
       }
-      gdArr[i-1].frameScore = strikeScore;
     }
-  }
-}
-
-const checkForSpare = (gdArr) => {
-  for (let i = 0; i < gdArr.length; i++) {
-    if (gdArr[i] !== gdArr[0] && gdArr[i-1].result === 'spare') {
-      gdArr[i-1].frameScore = gdArr[i-1].rollOneScore + gdArr[i-1].rollTwoScore + gdArr[i].rollOneScore;
+  } else {
+    if (frameTenRollTwo === 10 || frameTenRollTwo + frameTenRollOne === 10) {
+      frameTenRollThree = Math.floor(Math.random() * 11);
+    } else {
+      frameTenRollThree = Math.floor(Math.random() * (10 - frameTenRollTwo));
     }
+    frameData = {
+      frame: 10,
+      rollOneScore: frameTenRollOne,
+      rollTwoScore: frameTenRollTwo,
+      rollThreeScore: frameTenRollThree,
+      frameScore: frameTenRollOne + frameTenRollTwo + frameTenRollThree,
+      result: 'final frame'
+    }
+    console.log('3:', frameTenRollThree);
+    gameData.push(frameData);
+    console.log(gameData);
+    document.getElementById('endGame').innerHTML = 'End Game';
+    frameTenRollOne = null;
+    frameTenRollTwo = null;
+    frameTenRollThree = null;
   }
-}
 
-let rollOnePins = null
-let rollTwoPins = null
+}
 
 const roll = () => {
   if (rollOnePins === null) {
-    // random number between 0 and 10
     rollOnePins = Math.floor(Math.random() * 11);
-    // rollOnePins = Math.floor(Math.random() * 10) + 1;
     console.log('1:', rollOnePins);
     if (rollOnePins === 10) {
       scoring([rollOnePins, rollTwoPins]);
       rollOnePins = null;
     }
   } else if (rollOnePins !== null) {
-    // random number between 0 and (10 - rollOnePins)
     rollTwoPins = Math.floor(Math.random() * (10 - rollOnePins));
     console.log('1:',rollOnePins, '2:',rollTwoPins);
     scoring([rollOnePins, rollTwoPins]);
@@ -170,9 +156,6 @@ const scoring = (arr) => {
   gameData.push(frameData);
   checkForSpare(gameData);
   checkForStrike(gameData);
-  if (gameData[gameData.length-1].frame === 10) {
-    console.log('game over');
-  }
   console.log(gameData);
 }
 
@@ -182,4 +165,27 @@ const score = (arr) => {
     score += frame.frameScore;
   });
   return score;
+}
+
+const checkForStrike = (gdArr) => {
+  let strikeScore = 0;
+  for (let i = 0; i < gdArr.length; i++) {
+    if (gdArr[i] !== gdArr[0] && gdArr[i-1].result === 'strike') {
+      strikeScore = gdArr[i-1].rollOneScore + gdArr[i].rollOneScore;
+      if (gdArr[i+1] !== undefined && gdArr[i].rollTwoScore === null)  {
+        strikeScore += gdArr[i+1].rollOneScore;
+      } else {
+        strikeScore += gdArr[i].rollTwoScore;
+      }
+      gdArr[i-1].frameScore = strikeScore;
+    }
+  }
+}
+
+const checkForSpare = (gdArr) => {
+  for (let i = 0; i < gdArr.length; i++) {
+    if (gdArr[i] !== gdArr[0] && gdArr[i-1].result === 'spare') {
+      gdArr[i-1].frameScore = gdArr[i-1].rollOneScore + gdArr[i-1].rollTwoScore + gdArr[i].rollOneScore;
+    }
+  }
 }
