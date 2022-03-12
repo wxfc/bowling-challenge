@@ -1,4 +1,4 @@
-# Bowling Club
+# 10 Pin Bowling Club
 
 ## Instructions
 
