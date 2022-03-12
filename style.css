@@ -1,0 +1,38 @@
+body {
+  background: #1b1a17;
+}
+section {
+  background: #f0a500;
+  border-radius: 10px;
+  padding: 50px;
+  margin: 150px;
+  text-align: center;
+}
+@media (max-width: 800px) {
+  section {
+    margin: 50px;
+    padding: 10px;
+  }
+}
+button {
+  background: #e6d5b8;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+}
+#frames {
+  background: #e45826;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 25px;
+}
+@media (max-width: 800px) {
+  #frames {
+    margin: 10px;
+  }
+}
+#framesListed {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

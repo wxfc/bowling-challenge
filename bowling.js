@@ -1,19 +1,3 @@
-// 10 pin bowling app
-// 2 rolls per frame
-// 10 frames per game
-// 1 player
-// spare - 2 rolls in frame
-// if spare, the next roll is added to the previous frames score and current score
-// strike - 1 roll in frame
-// if strike, the next two rolls are added to the previous frames score and current score
-// 1 - 10 pins
-// 2
-
-// todo:
-// 1. handle frame 10 and gameover 
-// 2. reset button
-// 3. display score and frames
-
 let gameData = [];
 let frameData = {
   frame: 0,
@@ -21,16 +5,21 @@ let frameData = {
   rollTwoScore: 0,
   frameScore: 0
 }
+let rollCount = 0;
 
 const rollBtn = document.getElementById('roll');
 rollBtn.addEventListener('click', () => {
   if (gameData.length === 9) {
+    rollCount++;
+    numOfRolls.innerHTML = rollCount;
     handleFrameTen(gameData);
     document.getElementById('score').innerHTML = score(gameData);
   } else if (gameData[9] !== undefined && gameData[9].frame === 10) {
     // click reset button to start new game
     document.getElementById('resetGame').innerHTML = 'Click Reset to start new game';
   } else {
+    rollCount++;
+    numOfRolls.innerHTML = rollCount;
     roll();
   document.getElementById('score').innerHTML = score(gameData);
   }
@@ -48,8 +37,11 @@ resetBtn.addEventListener('click', () => {
   document.getElementById('score').innerHTML = score(gameData);
   document.getElementById('endGame').innerHTML = '';
   document.getElementById('resetGame').innerHTML = '';
+  document.getElementById('framesListed').innerHTML = '';
 })
 
+const frameDisplay = document.getElementById('framesListed');
+const numOfRolls = document.getElementById('numOfRolls');
 
 let rollOnePins = null 
 let rollTwoPins = null 
@@ -57,58 +49,6 @@ let rollTwoPins = null
 let frameTenRollOne = null
 let frameTenRollTwo = null
 let frameTenRollThree = null;
-
-const handleFrameTen = (gdArr) => {
-    console.log('frame ten');
-  if (frameTenRollOne === null) {
-    frameTenRollOne = Math.floor(Math.random() * 11);
-    console.log('1:', frameTenRollOne);
-  } else if (frameTenRollOne !== null && frameTenRollTwo === null) {
-    if (frameTenRollOne === 10) {
-      frameTenRollTwo = Math.floor(Math.random() * 11);
-      console.log('2:', frameTenRollTwo);
-    } else {
-      frameTenRollTwo = Math.floor(Math.random() * (10 - frameTenRollOne));
-      if (frameTenRollOne + frameTenRollTwo < 10) {
-        frameData = {
-          frame: 10,
-          rollOneScore: frameTenRollOne,
-          rollTwoScore: frameTenRollTwo,
-          frameScore: frameTenRollOne + frameTenRollTwo,
-          result: 'final frame'
-        }
-        gameData.push(frameData);
-        console.log('2:', frameTenRollTwo);
-        console.log(gameData);
-        document.getElementById('endGame').innerHTML = 'End Game';
-        frameTenRollOne = null;
-        frameTenRollTwo = null;
-      }
-    }
-  } else {
-    if (frameTenRollTwo === 10 || frameTenRollTwo + frameTenRollOne === 10) {
-      frameTenRollThree = Math.floor(Math.random() * 11);
-    } else {
-      frameTenRollThree = Math.floor(Math.random() * (10 - frameTenRollTwo));
-    }
-    frameData = {
-      frame: 10,
-      rollOneScore: frameTenRollOne,
-      rollTwoScore: frameTenRollTwo,
-      rollThreeScore: frameTenRollThree,
-      frameScore: frameTenRollOne + frameTenRollTwo + frameTenRollThree,
-      result: 'final frame'
-    }
-    console.log('3:', frameTenRollThree);
-    gameData.push(frameData);
-    console.log(gameData);
-    document.getElementById('endGame').innerHTML = 'End Game';
-    frameTenRollOne = null;
-    frameTenRollTwo = null;
-    frameTenRollThree = null;
-  }
-
-}
 
 const roll = () => {
   if (rollOnePins === null) {
@@ -150,12 +90,13 @@ const scoring = (arr) => {
       rollOneScore: arr[0],
       rollTwoScore: arr[1],
       frameScore: arr[0] + arr[1],
-      result: ''
+      result: 'done'
     }
   }
   gameData.push(frameData);
   checkForSpare(gameData);
   checkForStrike(gameData);
+  appendFrame(gameData);
   console.log(gameData);
 }
 
@@ -165,6 +106,20 @@ const score = (arr) => {
     score += frame.frameScore;
   });
   return score;
+}
+
+const appendFrame = (arr) => {
+  let frameArr = arr.slice();
+  frameArr.forEach(frame => {
+    if (document.getElementById(`frame${frame.frame}`) === null) {
+      let li = document.createElement('li');
+      li.setAttribute('id', `frame${frame.frame}`);
+      li.innerHTML = `Frame ${frame.frame}: ${frame.frameScore} ${frame.result === 'strike' ? 'X' : frame.result === 'spare' ? '/' : ''}`;
+      frameDisplay.appendChild(li);
+    } else {
+      document.getElementById(`frame${frame.frame}`).innerHTML = `Frame ${frame.frame}: ${frame.frameScore} ${frame.result === 'strike' ? 'X' : frame.result === 'spare' ? '/' : ''}`;
+    }
+  })
 }
 
 const checkForStrike = (gdArr) => {
@@ -188,4 +143,63 @@ const checkForSpare = (gdArr) => {
       gdArr[i-1].frameScore = gdArr[i-1].rollOneScore + gdArr[i-1].rollTwoScore + gdArr[i].rollOneScore;
     }
   }
+}
+
+const handleFrameTen = (gdArr) => {
+  console.log('frame ten');
+if (frameTenRollOne === null) {
+  frameTenRollOne = Math.floor(Math.random() * 11);
+  console.log('1:', frameTenRollOne);
+} else if (frameTenRollOne !== null && frameTenRollTwo === null) {
+  if (frameTenRollOne === 10) {
+    frameTenRollTwo = Math.floor(Math.random() * 11);
+    console.log('2:', frameTenRollTwo);
+  } else {
+    frameTenRollTwo = Math.floor(Math.random() * (10 - frameTenRollOne));
+    if (frameTenRollOne + frameTenRollTwo < 10) {
+      frameData = {
+        frame: 10,
+        rollOneScore: frameTenRollOne,
+        rollTwoScore: frameTenRollTwo,
+        frameScore: frameTenRollOne + frameTenRollTwo,
+        result: 'final frame'
+      }
+      gameData.push(frameData);
+      console.log('2:', frameTenRollTwo);
+      checkForSpare(gameData);
+      checkForStrike(gameData);
+      appendFrame(gameData);
+      console.log(gameData);
+      document.getElementById('endGame').innerHTML = 'End of Game';
+      frameTenRollOne = null;
+      frameTenRollTwo = null;
+    }
+  }
+} else {
+  if (frameTenRollTwo === 10 || frameTenRollTwo + frameTenRollOne === 10) {
+    frameTenRollThree = Math.floor(Math.random() * 11);
+  } else {
+    frameTenRollThree = Math.floor(Math.random() * (10 - frameTenRollTwo));
+  }
+  frameData = {
+    frame: 10,
+    rollOneScore: frameTenRollOne,
+    rollTwoScore: frameTenRollTwo,
+    rollThreeScore: frameTenRollThree,
+    rollThreeScore: 10,
+    frameScore: frameTenRollOne + frameTenRollTwo + frameTenRollThree,
+    result: 'final frame'
+  }
+  console.log('3:', frameTenRollThree);
+  gameData.push(frameData);
+  checkForSpare(gameData);
+  checkForStrike(gameData);
+  appendFrame(gameData);
+  console.log(gameData);
+  document.getElementById('endGame').innerHTML = 'End of Game';
+  frameTenRollOne = null;
+  frameTenRollTwo = null;
+  frameTenRollThree = null;
+}
+
 }

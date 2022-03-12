@@ -7,10 +7,6 @@ export const rollOne = () => {
   if (rollOnePins === null) {
     rollOnePins = Math.floor(Math.random() * 11);
   } 
-  // else if (rollOnePins !== null) {
-  //   // random number between 0 and (10 - rollOnePins)
-  //   rollTwoPins = Math.floor(Math.random() * (10 - rollOnePins));
-  // }
   return rollOnePins;
 }
 
@@ -19,7 +15,6 @@ export const rollTwo = () => {
     rollOnePins = Math.floor(Math.random() * 11);
   } 
   else if (rollOnePins !== null) {
-    // random number between 0 and (10 - rollOnePins)
     rollTwoPins = Math.floor(Math.random() * (10 - rollOnePins));
   }
   return rollTwoPins;
